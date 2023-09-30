@@ -36,11 +36,11 @@ impl<T> Tree<T> {
 }
 
 impl<T> Tree<T> {
-    fn get_root_node_id(&self) -> usize {
+    pub fn get_root_node_id(&self) -> usize {
         self.root_node_id
     }
 
-    fn insert(&mut self, parent_id: usize, value: T) -> Option<usize> {
+    pub fn insert(&mut self, parent_id: usize, value: T) -> Option<usize> {
         let is_valid_parent = parent_id < self.nodes.len();
 
         if !is_valid_parent {
@@ -73,7 +73,7 @@ impl<T> Tree<T> {
         Some(node_id)
     }
 
-    fn get_node_value(&self, node_id: usize) -> Option<&T> {
+    pub fn get_node_value(&self, node_id: usize) -> Option<&T> {
         let is_valid_id = node_id < self.nodes.len();
 
         if is_valid_id {
@@ -84,7 +84,7 @@ impl<T> Tree<T> {
         }
     }
 
-    fn get_node_value_mut(&mut self, node_id: usize) -> Option<&mut T> {
+    pub fn get_node_value_mut(&mut self, node_id: usize) -> Option<&mut T> {
         let is_valid_id = node_id < self.nodes.len();
 
         if is_valid_id {
@@ -95,7 +95,7 @@ impl<T> Tree<T> {
         }
     }
 
-    fn get_node_children_ids(&self, node_id: usize) -> Option<&[usize]> {
+    pub fn get_node_children_ids(&self, node_id: usize) -> Option<&[usize]> {
         let is_valid_id = node_id < self.nodes.len();
 
         if is_valid_id {
