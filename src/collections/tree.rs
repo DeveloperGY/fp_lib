@@ -14,7 +14,7 @@ pub struct Tree<T> {
 }
 
 impl<T> Tree<T> {
-    pub fn new(root_value: T) -> (Self, usize) {
+    pub fn new(root_value: T) -> Self {
         let mut id_gen = NodeIdGenerator::new();
 
         let mut nodes = Vec::new();
@@ -24,14 +24,11 @@ impl<T> Tree<T> {
 
         nodes.push(root_node);
 
-        (
-            Self {
-                nodes: nodes,
-                id_gen,
-                root_node_id: root_id
-            },
-            root_id
-        )
+        Self {
+            nodes: nodes,
+            id_gen,
+            root_node_id: root_id
+        }
     }
 }
 
