@@ -1,16 +1,12 @@
 mod node;
 mod node_builder;
-mod tree_base;
 mod node_id_generator;
 
 use node_id_generator::NodeIdGenerator;
 use node::TreeNode;
-use tree_base::TreeBase;
 use node_builder::TreeNodeBuilder;
 
 /// A general tree data structure
-/// 
-/// For a thread-safe implementation use [`ATree`] instead
 pub struct Tree<T> {
     nodes: Vec<TreeNode<T>>,
     id_gen: NodeIdGenerator,
@@ -39,7 +35,7 @@ impl<T> Tree<T> {
     }
 }
 
-impl<T> TreeBase<T> for Tree<T> {
+impl<T> Tree<T> {
     fn get_root_node_id(&self) -> usize {
         self.root_node_id
     }
@@ -107,30 +103,6 @@ impl<T> TreeBase<T> for Tree<T> {
         }
         else {
             None
-        }
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::{Tree, tree_base::TreeBase};
-    
-    #[test]
-    fn tree() {
-        let (mut tree, root_node) = Tree::new(0);
-
-        let node_0 = tree.insert(root_node, 1).unwrap();
-
-        let node_1 = tree.insert(node_0, 2).unwrap();
-
-        let node_2 = tree.insert(root_node, 3).unwrap();
-
-        let children = tree.get_node_children_ids(root_node).unwrap();
-
-        for child_id in children {
-            let value = tree.get_node_value(*child_id).unwrap();
-
-            println!("Id: {}\nValue: {}\n\n", child_id, value);
         }
     }
 }
