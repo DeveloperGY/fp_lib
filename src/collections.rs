@@ -1,3 +1,3 @@
-mod tree;
+pub mod graph;
 
-pub use tree::Tree;
+pub use graph::Graph;
