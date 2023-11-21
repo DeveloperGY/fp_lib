@@ -38,6 +38,7 @@ impl HTTPResponse {
             response_string = format!("{}\r\n{}", response_string, header);
         });
 
+        response_string += "\r\n\r\n";
         let mut response_bytes = response_string.as_bytes().to_vec();
         response_bytes.extend_from_slice(&self.body);
         response_bytes
