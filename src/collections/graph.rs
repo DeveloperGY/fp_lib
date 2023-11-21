@@ -3,7 +3,7 @@ use crate::util::IDGen;
 #[derive(Debug, Clone)]
 pub struct Graph<T> {
     nodes: Vec<Option<T>>,
-    adj_mat: Vec<Vec<bool>>, // change to Option<usize> for weights TODO: Add in weighted graph
+    adj_mat: Vec<Vec<bool>>, // change to Option<usize> for weights TODO: Implement weighted graph
 
     id_gen: IDGen
 }
@@ -128,6 +128,17 @@ impl<T> Graph<T> {
         if !self.validate_node_id(node_id) {return None};
 
         self.nodes[node_id].as_mut()
+    }
+
+    /**
+     * Returns true if the nodes are directly connected
+     */
+    pub fn is_connected(&self, node_src: usize, node_dest: usize) -> bool {
+        if !self.validate_node_id(node_src) || !self.validate_node_id(node_dest) {
+            return false;
+        }
+
+        self.adj_mat[node_src][node_dest]
     }
 }
 
