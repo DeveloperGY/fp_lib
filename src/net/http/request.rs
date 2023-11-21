@@ -26,7 +26,7 @@ impl HTTPRequest {
 impl HTTPRequest {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, String> {
         if bytes.len() == 0 {
-            return Err("Invalid byte count!".into());
+            return Err("Client closed connection!".into());
         }   
 
         let body_index = HTTPRequest::find_body_index(bytes)?;
@@ -60,7 +60,7 @@ impl HTTPRequest {
 
             request_bytes.extend_from_slice(&buffer[..bytes_read]);
 
-            if bytes_read == 0 {
+            if bytes_read < BUFFER_SIZE {
                 break;
             }
         }
