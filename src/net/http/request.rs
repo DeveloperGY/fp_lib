@@ -53,14 +53,14 @@ impl HTTPRequest {
         let mut request_bytes = vec![];
         
         const BUFFER_SIZE: usize = 1024;
-        let mut buffer = [0; 1024];
+        let mut buffer = [0; BUFFER_SIZE];
 
         loop {
             let bytes_read = stream.read(&mut buffer).map_err(|_| {String::from("Failed to read tcp stream!")})?;
 
             request_bytes.extend_from_slice(&buffer[..bytes_read]);
 
-            if bytes_read < BUFFER_SIZE {
+            if bytes_read == 0 {
                 break;
             }
         }
