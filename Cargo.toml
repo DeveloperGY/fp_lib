@@ -1,8 +1,8 @@
 [package]
 name = "fp_lib"
-version = "0.5.3"
+version = "0.6.0"
 edition = "2021"
-license = "GPL-3.0"
+license = "MIT"
 description = "A library of useful things"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
