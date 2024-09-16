@@ -31,7 +31,7 @@ impl Logger {
 
         write!(
             dest,
-            "[{}:{}:{}] [{}/{}]: {}",
+            "[{:0>2}:{:0>2}:{:0>2}] [{}/{}]: {}",
             hour, minute, second, thread_name, log_type, msg
         )
         .unwrap();
