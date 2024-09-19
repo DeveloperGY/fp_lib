@@ -6,7 +6,7 @@ use std::{
 
 use super::HttpRequest;
 use super::HttpResponse;
-use crate::io::{IntoSplit, SplitMut};
+pub use crate::io::{IntoSplit, SplitMut};
 
 pub struct HttpReceiverMut<'http, 'tcp: 'http> {
     rx: &'http mut BufReader<&'tcp TcpStream>,
@@ -88,11 +88,16 @@ pub struct HttpStream<'tcp> {
 impl<'tcp> HttpStream<'tcp> {
     /// Using the TcpStream passed into this function after it is called can lead to data loss and
     /// as such is inadvisable, just like when using the underlying reader of a BufReader
-    pub fn new(stream: &'tcp TcpStream) -> Self {
+    pub fn new(
+        stream: &'tcp TcpStream, /*, read_timeout: std::time::Duration*/
+    ) -> std::io::Result<Self> {
+        //debug_assert!(!read_timeout.is_zero());
+        //let _ = stream.set_read_timeout(Some(read_timeout));
+        stream.set_nonblocking(true)?;
         let rx = BufReader::new(stream);
         let tx = BufWriter::new(stream);
 
-        Self { rx, tx }
+        Ok(Self { rx, tx })
     }
 
     pub fn send_request(&mut self, request: &HttpRequest) -> Result<(), std::io::Error> {
@@ -138,14 +143,32 @@ impl<'tcp> IntoSplit<HttpReceiver<'tcp>, HttpTransmitter<'tcp>> for HttpStream<'
 fn receive_http_request(rx: &mut BufReader<&TcpStream>) -> std::io::Result<HttpRequest> {
     // Get Request line
     let mut request_line_buf = String::new();
-    rx.read_line(&mut request_line_buf)?;
+    'reading_request_line: loop {
+        match rx.read_line(&mut request_line_buf) {
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::WouldBlock => continue,
+                _ => {
+                    return Err(err);
+                }
+            },
+            _ => break 'reading_request_line,
+        };
+    }
 
     // Get Headers
     let mut header_strings = Vec::new();
 
     'reading_headers: loop {
         let mut buf = String::new();
-        rx.read_line(&mut buf)?;
+        match rx.read_line(&mut buf) {
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::WouldBlock => continue,
+                _ => {
+                    return Err(err);
+                }
+            },
+            _ => (),
+        };
 
         let line = buf.trim();
 
@@ -162,7 +185,15 @@ fn receive_http_request(rx: &mut BufReader<&TcpStream>) -> std::io::Result<HttpR
     const BUFFER_SIZE: usize = 512;
     let mut buffer = [0_u8; BUFFER_SIZE];
     'reading_body: loop {
-        let bytes_read = rx.read(&mut buffer)?;
+        let bytes_read = match rx.read(&mut buffer) {
+            Ok(val) => val,
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::WouldBlock => 0,
+                _ => {
+                    return Err(err);
+                }
+            },
+        };
 
         bytes.extend_from_slice(&buffer[..bytes_read]);
 
@@ -218,14 +249,34 @@ fn send_http_request(tx: &mut BufWriter<&TcpStream>, request: &HttpRequest) -> s
 fn receive_http_response(rx: &mut BufReader<&TcpStream>) -> std::io::Result<HttpResponse> {
     // Get Status line
     let mut status_line_buf = String::new();
-    rx.read_line(&mut status_line_buf)?;
+
+    'reading_status_line: loop {
+        match rx.read_line(&mut status_line_buf) {
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::WouldBlock => continue,
+                _ => {
+                    return Err(err);
+                }
+            },
+            _ => break 'reading_status_line,
+        };
+    }
 
     // Get Headers
     let mut header_strings = Vec::new();
 
     'reading_headers: loop {
         let mut buf = String::new();
-        rx.read_line(&mut buf)?;
+
+        match rx.read_line(&mut buf) {
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::WouldBlock => continue,
+                _ => {
+                    return Err(err);
+                }
+            },
+            _ => (),
+        };
 
         let line = buf.trim();
 
@@ -242,7 +293,15 @@ fn receive_http_response(rx: &mut BufReader<&TcpStream>) -> std::io::Result<Http
     const BUFFER_SIZE: usize = 512;
     let mut buffer = [0_u8; BUFFER_SIZE];
     'reading_body: loop {
-        let bytes_read = rx.read(&mut buffer)?;
+        let bytes_read = match rx.read(&mut buffer) {
+            Ok(val) => val,
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::WouldBlock => 0,
+                _ => {
+                    return Err(err);
+                }
+            },
+        };
 
         bytes.extend_from_slice(&buffer[..bytes_read]);
 
