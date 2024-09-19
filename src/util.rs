@@ -5,14 +5,14 @@ use std::collections::VecDeque;
 #[derive(Debug, Clone)]
 pub struct IDGen {
     current_id: usize,
-    available_ids: VecDeque<usize>
+    available_ids: VecDeque<usize>,
 }
 
 impl IDGen {
     pub fn new() -> Self {
         Self {
             current_id: 0,
-            available_ids: VecDeque::new()
+            available_ids: VecDeque::new(),
         }
     }
 

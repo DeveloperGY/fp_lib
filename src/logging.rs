@@ -3,7 +3,7 @@ use crate::time::UTCTime;
 pub struct Logger;
 
 impl Logger {
-    pub fn info(dest: &mut impl std::io::Write, thread_name: &str, msg: &str) {
+    pub fn info(mut dest: impl std::io::Write, thread_name: &str, msg: &str) {
         let time = std::time::SystemTime::now();
         let hour = time.get_current_hour_24();
         let minute = time.get_current_minute();
@@ -19,7 +19,7 @@ impl Logger {
         dest.flush().unwrap();
     }
 
-    pub fn warn(dest: &mut impl std::io::Write, thread_name: &str, msg: &str) {
+    pub fn warn(mut dest: impl std::io::Write, thread_name: &str, msg: &str) {
         let time = std::time::SystemTime::now();
         let hour = time.get_current_hour_24();
         let minute = time.get_current_minute();
@@ -35,7 +35,7 @@ impl Logger {
         dest.flush().unwrap();
     }
 
-    pub fn err(dest: &mut impl std::io::Write, thread_name: &str, msg: &str) {
+    pub fn err(mut dest: impl std::io::Write, thread_name: &str, msg: &str) {
         let time = std::time::SystemTime::now();
         let hour = time.get_current_hour_24();
         let minute = time.get_current_minute();

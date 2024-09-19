@@ -1,7 +1,8 @@
-mod header;
-mod request;
-mod response;
+mod http_request;
+mod http_response;
+mod http_stream;
+mod http_traits;
 
-pub use header::HTTPHeader;
-pub use request::HTTPRequest;
-pub use response::HTTPResponse;
+pub use http_request::HttpRequest;
+pub use http_response::HttpResponse;
+pub use http_stream::HttpStream;
