@@ -89,6 +89,12 @@ impl HttpRequestBuilder {
     }
 }
 
+impl Default for HttpRequestBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// HTTP 1.x Request
 pub struct HttpRequest {
     method: String,

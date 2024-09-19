@@ -160,19 +160,18 @@ fn receive_http_request(rx: &mut BufReader<&TcpStream>) -> std::io::Result<HttpR
 
     'reading_headers: loop {
         let mut buf = String::new();
-        match rx.read_line(&mut buf) {
-            Err(err) => match err.kind() {
+        if let Err(err) = rx.read_line(&mut buf) {
+            match err.kind() {
                 std::io::ErrorKind::WouldBlock => continue,
                 _ => {
                     return Err(err);
                 }
-            },
-            _ => (),
-        };
+            };
+        }
 
         let line = buf.trim();
 
-        if line.len() == 0 {
+        if line.is_empty() {
             break 'reading_headers;
         }
 
@@ -217,12 +216,10 @@ fn receive_http_request(rx: &mut BufReader<&TcpStream>) -> std::io::Result<HttpR
     // Process Headers
     let headers: HashMap<String, String> = header_strings
         .into_iter()
-        .map(|line| {
+        .filter_map(|line| {
             line.split_once(':')
                 .map(|(key, val)| (key.to_string(), val.to_string()))
         })
-        .filter(|val| val.is_some())
-        .map(|val| val.unwrap())
         .collect();
 
     // Process Body
@@ -268,19 +265,18 @@ fn receive_http_response(rx: &mut BufReader<&TcpStream>) -> std::io::Result<Http
     'reading_headers: loop {
         let mut buf = String::new();
 
-        match rx.read_line(&mut buf) {
-            Err(err) => match err.kind() {
+        if let Err(err) = rx.read_line(&mut buf) {
+            match err.kind() {
                 std::io::ErrorKind::WouldBlock => continue,
                 _ => {
                     return Err(err);
                 }
-            },
-            _ => (),
-        };
+            };
+        }
 
         let line = buf.trim();
 
-        if line.len() == 0 {
+        if line.is_empty() {
             break 'reading_headers;
         }
 
@@ -330,12 +326,10 @@ fn receive_http_response(rx: &mut BufReader<&TcpStream>) -> std::io::Result<Http
     // Process Headers
     let headers: HashMap<String, String> = header_strings
         .into_iter()
-        .map(|line| {
+        .filter_map(|line| {
             line.split_once(':')
                 .map(|(key, val)| (key.to_string(), val.to_string()))
         })
-        .filter(|val| val.is_some())
-        .map(|val| val.unwrap())
         .collect();
 
     // Process Body

@@ -88,6 +88,12 @@ impl HttpResponseBuilder {
     }
 }
 
+impl Default for HttpResponseBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// HTTP 1.x Response
 pub struct HttpResponse {
     version: String,

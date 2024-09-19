@@ -17,7 +17,6 @@ pub enum ThreadPoolError {
 pub struct ThreadPool {
     workers: Vec<Worker>,
     tx: Sender<WorkerAssignment>,
-    rx: Arc<Mutex<Receiver<WorkerAssignment>>>,
     panic_flag: Arc<Mutex<bool>>,
 }
 
@@ -39,7 +38,6 @@ impl ThreadPool {
         Self {
             workers,
             tx: sender,
-            rx,
             panic_flag,
         }
     }
@@ -49,7 +47,7 @@ impl ThreadPool {
             return Err(ThreadPoolError::Poisoned);
         }
 
-        if let Err(_) = self.tx.send(WorkerAssignment::Job(Box::new(f))) {
+        if self.tx.send(WorkerAssignment::Job(Box::new(f))).is_err() {
             return Err(ThreadPoolError::JobSendFailure);
         }
 
